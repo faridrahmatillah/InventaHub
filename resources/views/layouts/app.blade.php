@@ -18,7 +18,6 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <!-- Logika Auth Blade (Mengecek status user) -->
                     @guest
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">Login</a>
@@ -28,14 +27,18 @@
                         </li>
                     @else
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('categories.index') }}">Kategori</a>
+                            <a class="nav-link {{ request()->routeIs('categories.*') ? 'active fw-bold' : '' }}" href="{{ route('categories.index') }}">Kategori</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('products.index') }}">Data Barang</a>
+                            <a class="nav-link {{ request()->routeIs('products.*') ? 'active fw-bold' : '' }}" href="{{ route('products.index') }}">Data Barang</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Halo, {{ Auth::user()->name }}
+                        <!-- Ini menu baru untuk Transaksi -->
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('transactions.*') ? 'active fw-bold' : '' }}" href="{{ route('transactions.index') }}">Transaksi</a>
+                        </li>
+                        <li class="nav-item dropdown ms-2">
+                            <a class="nav-link dropdown-toggle bg-dark rounded px-3" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                👤 {{ Auth::user()->name }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>

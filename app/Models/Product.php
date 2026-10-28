@@ -23,4 +23,10 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    // Relasi: 1 Produk memiliki banyak Transaksi (Barang Masuk/Keluar)
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TransactionController;
 
 // URL Utama diarahkan ke produk (nantinya akan dihadang oleh middleware auth kalau belum login)
 Route::redirect('/', '/products');
@@ -20,5 +21,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
+    
+    // Route untuk Transaksi (Barang Masuk/Keluar)
+    Route::resource('transactions', TransactionController::class)->only(['index', 'create', 'store']);
+    
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
