@@ -11,7 +11,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        // Mengambil semua data kategori dari database terbaru ke terlama
+        $categories = \App\Models\Category::latest()->get(); 
+        return view('categories.index', compact('categories'));
     }
 
     /**
@@ -19,7 +21,8 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        // Menampilkan form tambah
+        return view('categories.create');
     }
 
     /**
@@ -27,7 +30,23 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // 1. Validasi inputan (Wajib ada nama, maksimal 255 karakter)
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string'
+        ], [
+            // Pesan error custom biar lebih rapi (poin plus UAS)
+            'name.required' => 'Nama kategori wajib diisi!',
+        ]);
+
+        // 2. Simpan ke database
+        \App\Models\Category::create([
+            'name' => $request->name,
+            'description' => $request->description
+        ]);
+
+        // 3. Kembalikan ke halaman index dengan pesan sukses
+        return redirect()->route('categories.index')->with('success', 'Kategori baru berhasil ditambahkan!');
     }
 
     /**
