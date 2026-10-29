@@ -9,10 +9,6 @@
                 <a href="{{ route('products.create') }}" class="btn btn-primary btn-sm">+ Tambah Barang</a>
             </div>
             <div class="card-body">
-                @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-                
                 <table class="table table-bordered table-hover mt-2 align-middle">
                     <thead class="table-light">
                         <tr>

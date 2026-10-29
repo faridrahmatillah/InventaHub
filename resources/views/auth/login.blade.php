@@ -8,10 +8,6 @@
                 <h5 class="mb-0 text-primary fw-bold">Login Sistem</h5>
             </div>
             <div class="card-body px-4 py-4">
-                @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-                
                 <form action="{{ route('login.post') }}" method="POST">
                     @csrf
                     <div class="mb-3">

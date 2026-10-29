@@ -9,10 +9,6 @@
                 <a href="{{ route('categories.create') }}" class="btn btn-primary btn-sm">+ Tambah Kategori</a>
             </div>
             <div class="card-body">
-                @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-                
                 <table class="table table-bordered table-hover mt-2">
                     <thead class="table-light">
                         <tr>

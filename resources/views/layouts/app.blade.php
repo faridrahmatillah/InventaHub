@@ -57,6 +57,9 @@
 
     <!-- Konten Utama -->
     <div class="container">
+        <!-- Notifikasi sukses/error otomatis untuk semua halaman -->
+        <x-flash />
+
         @yield('content')
     </div>
 

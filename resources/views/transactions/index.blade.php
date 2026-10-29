@@ -9,13 +9,6 @@
                 <a href="{{ route('transactions.create') }}" class="btn btn-primary btn-sm">+ Catat Transaksi</a>
             </div>
             <div class="card-body">
-                @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-                @if(session('error'))
-                    <div class="alert alert-danger">{{ session('error') }}</div>
-                @endif
-                
                 <table class="table table-bordered table-hover mt-2 align-middle">
                     <thead class="table-light">
                         <tr>
