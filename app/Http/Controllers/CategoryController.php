@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -12,7 +13,7 @@ class CategoryController extends Controller
     public function index()
     {
         // Mengambil semua data kategori dari database terbaru ke terlama
-        $categories = \App\Models\Category::latest()->get(); 
+        $categories = Category::latest()->get();
         return view('categories.index', compact('categories'));
     }
 
@@ -31,7 +32,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         // 1. Validasi inputan (Wajib ada nama, maksimal 255 karakter)
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string'
         ], [
@@ -40,9 +41,9 @@ class CategoryController extends Controller
         ]);
 
         // 2. Simpan ke database
-        \App\Models\Category::create([
-            'name' => $request->name,
-            'description' => $request->description
+        Category::create([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null
         ]);
 
         // 3. Kembalikan ke halaman index dengan pesan sukses
@@ -52,32 +53,53 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Category $category)
     {
-        //
+        // Eager loading relasi produk supaya tidak terjadi query berulang (N+1)
+        $category->load('products');
+
+        return view('categories.show', compact('category'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Category $category)
     {
-        //
+        // Kirim data kategori yang akan diedit ke view
+        return view('categories.edit', compact('category'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Category $category)
     {
-        //
+        // Validasi inputan (sama seperti store)
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string'
+        ], [
+            'name.required' => 'Nama kategori wajib diisi!',
+        ]);
+
+        // Update data lewat Eloquent ORM
+        $category->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null
+        ]);
+
+        return redirect()->route('categories.index')->with('success', 'Data kategori berhasil diperbarui!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Category $category)
     {
-        //
+        // Hapus data lewat Eloquent ORM
+        $category->delete();
+
+        return redirect()->route('categories.index')->with('success', 'Data kategori berhasil dihapus!');
     }
 }

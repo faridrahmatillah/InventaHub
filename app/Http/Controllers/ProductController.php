@@ -25,7 +25,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         // Validasi inputan (Kode barang tidak boleh sama)
-        $request->validate([
+        $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'code'        => 'required|string|unique:products,code|max:50',
             'name'        => 'required|string|max:255',
@@ -37,9 +37,18 @@ class ProductController extends Controller
             'category_id.required' => 'Pilih kategori terlebih dahulu!',
         ]);
 
-        Product::create($request->all());
+        // Hanya data hasil validasi yang disimpan (bukan seluruh input request)
+        Product::create($validated);
 
         return redirect()->route('products.index')->with('success', 'Barang baru berhasil ditambahkan!');
+    }
+
+    public function show(Product $product)
+    {
+        // Eager loading kategori & riwayat transaksi milik produk ini
+        $product->load(['category', 'transactions']);
+
+        return view('products.show', compact('product'));
     }
 
     public function edit(Product $product)
@@ -50,7 +59,7 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        $request->validate([
+        $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'code'        => 'required|string|max:50|unique:products,code,' . $product->id,
             'name'        => 'required|string|max:255',
@@ -59,7 +68,8 @@ class ProductController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $product->update($request->all());
+        // Update hanya field yang lolos validasi (Eloquent ORM)
+        $product->update($validated);
 
         return redirect()->route('products.index')->with('success', 'Data barang berhasil diperbarui!');
     }

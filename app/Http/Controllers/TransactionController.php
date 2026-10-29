@@ -24,8 +24,8 @@ class TransactionController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi input
-        $request->validate([
+        // Validasi input, hasilnya disimpan di $validated agar hanya data bersih yang masuk database
+        $validated = $request->validate([
             'product_id'       => 'required|exists:products,id',
             'type'             => 'required|in:in,out',
             'quantity'         => 'required|integer|min:1',
@@ -36,28 +36,29 @@ class TransactionController extends Controller
         // Gunakan DB Transaction untuk keamanan integritas data (Syarat CPMK2 & CPMK4)
         DB::beginTransaction();
         try {
-            $product = Product::findOrFail($request->product_id);
+            $product = Product::findOrFail($validated['product_id']);
 
             // Cek jika barang keluar, stok tidak boleh minus
-            if ($request->type == 'out' && $product->stock < $request->quantity) {
+            if ($validated['type'] == 'out' && $product->stock < $validated['quantity']) {
+                DB::rollBack();
                 return back()->withErrors(['quantity' => 'Stok tidak mencukupi! Sisa stok: ' . $product->stock])->withInput();
             }
 
-            // 1. Simpan data transaksi
-            Transaction::create($request->all());
+            // 1. Simpan data transaksi (hanya field hasil validasi)
+            Transaction::create($validated);
 
             // 2. Update stok barang
-            if ($request->type == 'in') {
-                $product->stock += $request->quantity;
+            if ($validated['type'] == 'in') {
+                $product->stock += $validated['quantity'];
             } else {
-                $product->stock -= $request->quantity;
+                $product->stock -= $validated['quantity'];
             }
             $product->save();
 
             // Jika sukses semua, commit/permanenkan ke database
             DB::commit();
             return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil & Stok otomatis terupdate!');
-            
+
         } catch (\Exception $e) {
             // Jika ada error/gagal di tengah jalan, batalkan semua proses
             DB::rollBack();
