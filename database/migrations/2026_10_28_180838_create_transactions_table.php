@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             // Relasi ke tabel products (Syarat wajib UAS)
-            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            // restrictOnDelete: produk tidak bisa dihapus selama riwayat transaksinya masih ada
+            $table->foreignId('product_id')->constrained('products')->restrictOnDelete();
             // Jenis transaksi: 'in' (Masuk) atau 'out' (Keluar)
             $table->enum('type', ['in', 'out']);
             $table->integer('quantity');

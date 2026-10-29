@@ -76,6 +76,12 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        // Produk yang punya riwayat transaksi tidak boleh dihapus (aturan restrictOnDelete)
+        if ($product->transactions()->exists()) {
+            return redirect()->route('products.index')
+                ->with('error', 'Barang tidak bisa dihapus karena masih memiliki riwayat transaksi.');
+        }
+
         $product->delete();
         return redirect()->route('products.index')->with('success', 'Data barang berhasil dihapus!');
     }

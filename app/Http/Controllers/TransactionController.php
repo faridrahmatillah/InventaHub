@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TransactionController extends Controller
 {
@@ -62,7 +63,14 @@ class TransactionController extends Controller
         } catch (\Exception $e) {
             // Jika ada error/gagal di tengah jalan, batalkan semua proses
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+
+            // Detail teknis hanya ditulis ke log server (storage/logs/laravel.log),
+            // TIDAK ditampilkan ke user agar struktur database tidak bocor.
+            Log::error('Gagal menyimpan transaksi: ' . $e->getMessage());
+
+            return back()
+                ->with('error', 'Transaksi gagal diproses. Silakan coba lagi atau hubungi admin.')
+                ->withInput();
         }
     }
 }

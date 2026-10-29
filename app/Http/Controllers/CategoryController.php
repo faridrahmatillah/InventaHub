@@ -97,7 +97,12 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        // Hapus data lewat Eloquent ORM
+        // Kategori yang masih punya produk tidak boleh dihapus (aturan restrictOnDelete)
+        if ($category->products()->exists()) {
+            return redirect()->route('categories.index')
+                ->with('error', 'Kategori tidak bisa dihapus karena masih memiliki produk.');
+        }
+
         $category->delete();
 
         return redirect()->route('categories.index')->with('success', 'Data kategori berhasil dihapus!');
