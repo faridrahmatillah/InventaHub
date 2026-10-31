@@ -1,71 +1,136 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# GudangKita
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+GudangKita adalah aplikasi web inventaris berbasis Laravel untuk mengelola produk gudang. Antarmukanya saat ini menggunakan nama InventaHub.
 
-## About Laravel
+## Fitur yang tersedia
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Registrasi akun staff, login, dan logout.
+- Dashboard berisi ringkasan kategori, produk, transaksi terbaru, serta produk dengan stok kurang dari lima.
+- Produk: daftar, detail, tambah, ubah, dan soft delete. Mengubah dan menonaktifkan produk dibatasi untuk admin; produk dengan stok tersisa tidak dapat dinonaktifkan.
+- Kategori dan pemasok: pengelolaan oleh admin, termasuk soft delete.
+- Transaksi barang masuk dan keluar. Stok diperbarui dalam transaksi database; transaksi masuk memerlukan pemasok.
+- Stok opname: admin dan staff dapat melihat serta membuat catatan. Penyimpanan catatan menyesuaikan stok secara atomik; catatan tidak memiliki aksi ubah atau hapus.
+- Pembatasan akses berdasarkan login dan peran admin/staff.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Pendaftaran publik selalu membuat peran staff. Tidak ada halaman pemilihan peran admin, verifikasi email, atau alur reset password yang didefinisikan di rute aplikasi saat ini.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Persyaratan
 
-## Struktur data inventaris
+- PHP **8.3 atau lebih baru**, sesuai `composer.json`, dengan ekstensi PHP yang dibutuhkan Laravel dan `pdo_mysql` untuk database MySQL/MariaDB. Ekstensi `pdo_sqlite` juga diperlukan bila ingin menjalankan test suite yang dikonfigurasi memakai SQLite in-memory.
+- Composer 2.x (project tidak menetapkan batas versi Composer tertentu).
+- MySQL atau MariaDB yang kompatibel dengan Laravel 13. Project menyediakan konfigurasi `mysql` dan `mariadb`; versi minimum server tidak dipatok dalam manifest project.
+- Node.js **20.19 atau lebih baru**, atau **22.12 atau lebih baru**, sesuai kebutuhan Vite pada `package-lock.json`; npm ikut tersedia bersama Node.js.
+- Git.
 
-Tabel utama aplikasi membentuk relasi berikut:
+## Instalasi lokal
 
-- `categories` memiliki banyak `products`.
-- `products` memiliki banyak `transactions` dan `stock_opnames`.
-- `suppliers` dapat dicatat pada transaksi barang masuk.
-- `users` dicatat sebagai pembuat transaksi dan stok opname.
-- `stock_opnames` menyimpan stok sistem, hasil hitung fisik, dan selisih. Penyimpanan opname sekaligus menyesuaikan stok produk dalam satu transaksi database; catatan opname tidak dapat diedit atau dihapus.
-- Admin dan staff dapat melihat serta membuat catatan stok opname. Akun yang sedang login otomatis menjadi pencatat untuk kebutuhan audit.
+Contoh berikut memakai PowerShell pada Windows. Sesuaikan lokasi kerja dan kredensial database dengan mesin Anda.
 
-Setelah mengambil perubahan kode, terapkan migrasi baru dengan `php artisan migrate`.
+1. Clone repository dan masuk ke foldernya:
 
-## Learning Laravel
+   ```powershell
+   git clone https://github.com/faridrahmatillah/InventaHub.git
+   cd InventaHub
+   ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2. Buat konfigurasi lokal dari contoh. Jangan commit `.env`:
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+   ```powershell
+   Copy-Item .env.example .env
+   ```
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+3. Buat database MySQL. Jalankan SQL berikut melalui klien MySQL dengan akun yang berwenang:
 
-## Agentic Development
+   ```sql
+   CREATE DATABASE gudangkita
+       CHARACTER SET utf8mb4
+       COLLATE utf8mb4_unicode_ci;
+   ```
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+4. Buka `.env` lokal dan sesuaikan `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, serta `DB_PASSWORD` dengan database yang baru dibuat. Contoh ini memakai `DB_CONNECTION=mysql`; jangan memasukkan kredensial ke repository.
 
-```bash
-composer require laravel/boost --dev
+5. Pasang dependency PHP, buat application key lokal, lalu jalankan migration:
 
-php artisan boost:install
+   ```powershell
+   composer install
+   php artisan key:generate
+   php artisan migrate
+   ```
+
+   Migration membuat tabel aplikasi beserta tabel pendukung database untuk session, cache, dan queue. Perintah migration tidak dijalankan otomatis oleh langkah-langkah di atas.
+
+6. (Opsional) Buat akun lokal melalui seeder:
+
+   ```powershell
+   php artisan db:seed
+   ```
+
+   Seeder hanya membuat akun ketika environment bernilai `local` atau `testing`. Akun yang tertulis di seeder adalah `admin@example.com` dan `staff@example.com`, masing-masing dengan password awal `password`. Ganti password untuk pemakaian pribadi dan **jangan** menjalankan seeder akun ini pada production.
+
+7. Pasang dependency frontend dan build asset:
+
+   ```powershell
+   npm ci
+   npm run build
+   ```
+
+8. Jalankan server development:
+
+   ```powershell
+   php artisan serve
+   ```
+
+   Buka `http://127.0.0.1:8000`.
+
+## Database dan pengujian
+
+Project menyediakan migration untuk `users`, `categories`, `products`, `transactions`, `suppliers`, dan `stock_opnames`, termasuk foreign key serta tabel pendukung Laravel. Gunakan migration sebagai sumber skema untuk instalasi baru:
+
+```powershell
+php artisan migrate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Pengujian PHPUnit mengatur SQLite in-memory melalui `phpunit.xml`, sehingga suite normal tidak memakai database MySQL pada `.env`. Pastikan ekstensi `pdo_sqlite` aktif:
 
-## Contributing
+```powershell
+php artisan test
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Dump tambahan ada di `database/exports/gudangkita.sql`. Dump tersebut bukan pengganti migration; periksa isi dan sensitivitas datanya sebelum membagikan atau mengimpornya. Status pengujian impor dump tidak dinyatakan di sini.
 
-## Code of Conduct
+## Deployment
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Detail deployment bergantung pada penyedia hosting dan web server yang dipilih. Sebelum deployment:
 
-## Security Vulnerabilities
+1. Arahkan document root web server ke folder `public`, bukan root repository.
+2. Pastikan server meneruskan URL yang tidak cocok dengan file statis ke `public/index.php`. `public/.htaccess` tersedia untuk Apache; Apache perlu `mod_rewrite` dan izin konfigurasi direktori yang sesuai. Web server lain memerlukan aturan rewrite yang setara dari pengelolanya. Tidak ada konfigurasi Nginx atau platform hosting tertentu di repository.
+3. Siapkan `.env` production di luar Git: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL` HTTPS, `APP_KEY` unik hasil `php artisan key:generate`, serta kredensial MySQL/MariaDB production. Jangan gunakan key lokal atau password seeder.
+4. Pasang dependency production (`composer install --no-dev --optimize-autoloader`) dan siapkan frontend dengan `npm ci` lalu `npm run build` di proses build; deploy direktori `public/build` beserta manifest Vite.
+5. Setelah backup dan persetujuan operator database, jalankan `php artisan migrate --force`. Jangan jalankan migration production sebelum target database dan rencana backup dipastikan.
+6. Beri hak tulis yang diperlukan kepada proses PHP pada `storage` dan `bootstrap/cache`. `php artisan storage:link` hanya diperlukan bila aplikasi mulai menggunakan disk publik; fitur unggah file tidak ditemukan pada fitur saat ini.
+7. Setelah konfigurasi production tersedia, cache konfigurasi/rute/view sesuai proses rilis hosting. Jika mengganti `.env`, perbarui cache konfigurasi dengan prosedur deployment hosting.
+8. Gunakan HTTPS dan aktifkan `SESSION_SECURE_COOKIE=true` untuk cookie session di production. Pastikan dump, backup, log, dan `.env` tidak dapat diakses dari web.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Belum ada target hosting, konfigurasi web server production, atau bukti deployment dalam repository. Verifikasi batas versi PHP/database, HTTPS, rewrite, permission, dan prosedur backup dengan penyedia hosting sebelum rilis.
 
-## License
+## Troubleshooting
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- **`SQLSTATE[HY000] [1049] Unknown database`**: buat database, lalu cocokkan `DB_DATABASE` di `.env`.
+- **`Access denied` atau koneksi ditolak**: periksa host/port, nama pengguna, password, hak akses MySQL, dan apakah layanan database berjalan.
+- **Driver `mysql` tidak ditemukan**: aktifkan ekstensi PHP `pdo_mysql` untuk CLI dan PHP yang digunakan web server.
+- **`No application encryption key has been specified`**: pastikan `.env` lokal tersedia, lalu jalankan `php artisan key:generate`.
+- **Tabel tidak ditemukan**: setelah memeriksa target koneksi, jalankan `php artisan migrate`. Jangan memakai opsi `migrate:fresh` pada database yang berisi data.
+- **Vite manifest tidak ditemukan**: jalankan `npm ci` dan `npm run build`, lalu pastikan `public/build/manifest.json` terdeploy.
+- **HTTP 419 / CSRF token mismatch**: pastikan browser menerima cookie session, form memakai token CSRF, dan URL/protokol cookie sesuai konfigurasi HTTPS.
+- **HTTP 403**: periksa login dan peran akun; kategori, pemasok, serta pengubahan produk dibatasi untuk admin.
+- **Halaman gangguan database / HTTP 503**: periksa koneksi database dan log aplikasi di `storage/logs`; halaman error tidak menampilkan detail koneksi kepada pengunjung.
+
+## Susunan utama kode
+
+- `routes/web.php`: rute web dan middleware login/peran.
+- `app/Http/Controllers`: alur request dan validasi.
+- `app/Models`: model Eloquent dan relasi.
+- `database/migrations`: definisi tabel dan foreign key.
+- `resources/views`: halaman Blade server-rendered.
+- `tests/Feature`: pengujian fitur yang tersedia.
+- `docs/presentasi-uas.md`: penjelasan arsitektur, request lifecycle, keamanan, dan deployment untuk presentasi.
