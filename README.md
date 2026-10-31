@@ -21,6 +21,19 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+## Struktur data inventaris
+
+Tabel utama aplikasi membentuk relasi berikut:
+
+- `categories` memiliki banyak `products`.
+- `products` memiliki banyak `transactions` dan `stock_opnames`.
+- `suppliers` dapat dicatat pada transaksi barang masuk.
+- `users` dicatat sebagai pembuat transaksi dan stok opname.
+- `stock_opnames` menyimpan stok sistem, hasil hitung fisik, dan selisih. Penyimpanan opname sekaligus menyesuaikan stok produk dalam satu transaksi database; catatan opname tidak dapat diedit atau dihapus.
+- Admin dan staff dapat melihat serta membuat catatan stok opname. Akun yang sedang login otomatis menjadi pencatat untuk kebutuhan audit.
+
+Setelah mengambil perubahan kode, terapkan migrasi baru dengan `php artisan migrate`.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.

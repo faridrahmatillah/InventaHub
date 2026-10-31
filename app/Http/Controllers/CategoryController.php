@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use PDOException;
 
 class CategoryController extends Controller
 {
@@ -12,9 +13,14 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        // Mengambil semua data kategori dari database terbaru ke terlama
-        $categories = Category::latest()->get();
-        return view('categories.index', compact('categories'));
+        try {
+            // withCount mencegah query tambahan (N+1) saat menampilkan jumlah produk.
+            $categories = Category::withCount('products')->latest()->get();
+
+            return view('categories.index', compact('categories'));
+        } catch (PDOException $exception) {
+            return $this->databaseErrorResponse($exception, 'categories.index');
+        }
     }
 
     /**
@@ -31,23 +37,24 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validasi inputan (Wajib ada nama, maksimal 255 karakter)
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string'
-        ], [
-            // Pesan error custom biar lebih rapi (poin plus UAS)
-            'name.required' => 'Nama kategori wajib diisi!',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+            ], [
+                'name.required' => 'Nama kategori wajib diisi!',
+            ]);
 
-        // 2. Simpan ke database
-        Category::create([
-            'name' => $validated['name'],
-            'description' => $validated['description'] ?? null
-        ]);
+            Category::create([
+                'name' => $validated['name'],
+                'description' => $validated['description'] ?? null,
+            ]);
 
-        // 3. Kembalikan ke halaman index dengan pesan sukses
-        return redirect()->route('categories.index')->with('success', 'Kategori baru berhasil ditambahkan!');
+            return redirect()->route('categories.index')
+                ->with('success', 'Kategori baru berhasil ditambahkan!');
+        } catch (PDOException $exception) {
+            return $this->databaseErrorRedirect($exception, 'categories.store');
+        }
     }
 
     /**
@@ -55,10 +62,14 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        // Eager loading relasi produk supaya tidak terjadi query berulang (N+1)
-        $category->load('products');
+        try {
+            // Eager loading relasi produk supaya tidak terjadi query berulang (N+1)
+            $category->load('products');
 
-        return view('categories.show', compact('category'));
+            return view('categories.show', compact('category'));
+        } catch (PDOException $exception) {
+            return $this->databaseErrorResponse($exception, 'categories.show');
+        }
     }
 
     /**
@@ -75,21 +86,24 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        // Validasi inputan (sama seperti store)
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string'
-        ], [
-            'name.required' => 'Nama kategori wajib diisi!',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+            ], [
+                'name.required' => 'Nama kategori wajib diisi!',
+            ]);
 
-        // Update data lewat Eloquent ORM
-        $category->update([
-            'name' => $validated['name'],
-            'description' => $validated['description'] ?? null
-        ]);
+            $category->update([
+                'name' => $validated['name'],
+                'description' => $validated['description'] ?? null,
+            ]);
 
-        return redirect()->route('categories.index')->with('success', 'Data kategori berhasil diperbarui!');
+            return redirect()->route('categories.index')
+                ->with('success', 'Data kategori berhasil diperbarui!');
+        } catch (PDOException $exception) {
+            return $this->databaseErrorRedirect($exception, 'categories.update');
+        }
     }
 
     /**
@@ -97,14 +111,21 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        // Kategori yang masih punya produk tidak boleh dihapus (aturan restrictOnDelete)
-        if ($category->products()->exists()) {
+        try {
+            // Cegah kategori dinonaktifkan jika masih memiliki produk aktif.
+            if ($category->products()->exists()) {
+                return redirect()->route('categories.index')
+                    ->with('error', 'Kategori tidak bisa dihapus karena masih memiliki produk aktif.');
+            }
+
+            // Soft delete, supaya data lama tidak langsung hilang dari database.
+            $category->delete();
+
             return redirect()->route('categories.index')
-                ->with('error', 'Kategori tidak bisa dihapus karena masih memiliki produk.');
+                ->with('success', 'Kategori berhasil dinonaktifkan.');
+        } catch (PDOException $exception) {
+            return $this->databaseErrorRedirect($exception, 'categories.destroy');
         }
-
-        $category->delete();
-
-        return redirect()->route('categories.index')->with('success', 'Data kategori berhasil dihapus!');
     }
+
 }

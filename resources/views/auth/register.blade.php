@@ -1,41 +1,91 @@
 @extends('layouts.app')
 
+@section('title', 'Registrasi')
+
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-sm border-0 mt-4">
-            <div class="card-header bg-white py-3 text-center">
-                <h5 class="mb-0 text-primary fw-bold">Registrasi Akun</h5>
-            </div>
-            <div class="card-body px-4 py-4">
-                <form action="{{ route('register.post') }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Nama Lengkap</label>
-                        <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
-                        @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Email</label>
-                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required>
-                        @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Password</label>
-                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required>
-                        @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Konfirmasi Password</label>
-                        <input type="password" name="password_confirmation" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 fw-bold">Daftar Sekarang</button>
-                </form>
-                <div class="text-center mt-3">
-                    Sudah punya akun? <a href="{{ route('login') }}" class="text-decoration-none">Login di sini</a>
-                </div>
-            </div>
+<div>
+
+    {{-- HEADING --}}
+    <div class="mb-8">
+        <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-600"></span>
+            Akun baru
         </div>
+
+        <h1 class="mt-4 text-[28px] font-semibold leading-tight tracking-[-0.03em] text-slate-950">
+            Mulai kelola inventaris
+        </h1>
+
+        <p class="mt-2 text-sm leading-6 text-slate-500">
+            Buat akun untuk mencatat pergerakan stok dan memantau produk gudang.
+        </p>
     </div>
+
+    <div class="mb-6 flex items-start gap-2.5 rounded-xl border border-emerald-100 bg-emerald-50/70 px-4 py-3.5">
+        <x-icon name="info" class="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />
+        <p class="text-[11px] leading-5 text-emerald-900">
+            Akun baru otomatis terdaftar sebagai <span class="font-semibold">Staff</span>. Hak akses Admin hanya diberikan oleh administrator.
+        </p>
+    </div>
+
+    <form action="{{ route('register.post') }}" method="POST">
+        @csrf
+
+        <x-input
+            name="name"
+            label="Nama Lengkap"
+            placeholder="Nama lengkap Anda"
+            autocomplete="name"
+            autofocus
+            required
+        />
+
+        <x-input
+            name="email"
+            type="email"
+            label="Email"
+            placeholder="nama@email.com"
+            autocomplete="email"
+            required
+        />
+
+        <div class="grid gap-x-5 sm:grid-cols-2">
+            <x-input
+                name="password"
+                type="password"
+                label="Password"
+                placeholder="Minimal 8 karakter"
+                autocomplete="new-password"
+                hint="Minimal 8 karakter."
+                toggle
+                required
+            />
+
+            <x-input
+                name="password_confirmation"
+                type="password"
+                label="Konfirmasi"
+                placeholder="Ulangi password"
+                autocomplete="new-password"
+                toggle
+                required
+            />
+        </div>
+
+        <button type="submit" data-loading-text="Mendaftarkan..." class="btn btn-primary mt-2 h-11 w-full">
+            Daftar Sekarang
+            <x-icon name="arrow-right" class="h-4 w-4" stroke="2" />
+        </button>
+    </form>
+
+    <div class="my-7 flex items-center gap-3">
+        <span class="h-px flex-1 bg-slate-100"></span>
+        <span class="text-[10px] font-medium uppercase tracking-[0.14em] text-slate-400">Sudah punya akun</span>
+        <span class="h-px flex-1 bg-slate-100"></span>
+    </div>
+
+    <a href="{{ route('login') }}" class="btn btn-secondary h-11 w-full">
+        Masuk ke akun Anda
+    </a>
 </div>
 @endsection

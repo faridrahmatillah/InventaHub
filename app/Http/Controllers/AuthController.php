@@ -16,21 +16,21 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        // Validasi ketat untuk keamanan form (Syarat CPMK4)
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        // Simpan user ke database dengan password terenkripsi (Hash)
         User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => 'staff',
         ]);
 
-        return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
+        return redirect()->route('login')
+            ->with('success', 'Registrasi berhasil! Silakan login.');
     }
 
     public function showLogin()
@@ -45,10 +45,11 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        // Proses validasi sesi login (Syarat CPMK4)
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/products')->with('success', 'Berhasil login!');
+
+            return redirect()->intended('/dashboard')
+                ->with('success', 'Berhasil login!');
         }
 
         return back()->withErrors([
@@ -59,8 +60,11 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login')->with('success', 'Anda telah logout.');
+
+        return redirect('/login')
+            ->with('success', 'Anda telah logout.');
     }
 }

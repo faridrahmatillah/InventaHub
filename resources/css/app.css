@@ -1,9 +1,339 @@
 @import 'tailwindcss';
 
+@source '../views/**/*.blade.php';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer base {
+    ::selection {
+        background-color: #d1fae5;
+        color: #064e3b;
+    }
+
+    html {
+        -webkit-tap-highlight-color: transparent;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-[#f4f7f5] text-slate-600;
+        text-rendering: optimizeLegibility;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        @apply text-slate-900;
+    }
+
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border: 3px solid transparent;
+        border-radius: 9999px;
+        background-color: #cbd5e1;
+        background-clip: content-box;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Design system InventaHub
+|--------------------------------------------------------------------------
+| Kelas komponen dibuat sekali di sini agar tombol, kartu, badge, tabel, dan
+| navigasi memiliki ukuran, warna, dan jarak yang konsisten di seluruh halaman.
+*/
+@layer components {
+    /* ---------- Card ---------- */
+    .card {
+        @apply rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.03),0_12px_28px_-24px_rgba(15,23,42,0.18)];
+    }
+
+    .card-header {
+        @apply flex flex-col items-start gap-3 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6;
+    }
+
+    .card-body {
+        @apply p-5 sm:p-6;
+    }
+
+    .card-footer {
+        @apply border-t border-slate-100 bg-slate-50/60 px-5 py-3.5 sm:px-6;
+    }
+
+    .section-title {
+        @apply text-[15px] font-semibold tracking-tight text-slate-900;
+    }
+
+    .section-subtitle {
+        @apply mt-1 text-xs leading-5 text-slate-500;
+    }
+
+    /* ---------- Button ---------- */
+    .btn {
+        @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-4 disabled:cursor-wait disabled:opacity-70 active:translate-y-px;
+    }
+
+    .btn-primary {
+        @apply bg-emerald-700 text-white shadow-sm shadow-emerald-900/10 hover:bg-emerald-800 focus-visible:ring-emerald-100;
+    }
+
+    .btn-secondary {
+        @apply border border-slate-200 bg-white text-slate-700 shadow-sm hover:border-emerald-200 hover:bg-emerald-50/60 hover:text-emerald-900 focus-visible:ring-emerald-100;
+    }
+
+    .btn-ghost {
+        @apply text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-slate-100;
+    }
+
+    .btn-danger {
+        @apply border border-red-200 bg-white text-red-600 hover:border-red-300 hover:bg-red-50 focus-visible:ring-red-100;
+    }
+
+    .btn-danger-solid {
+        @apply bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-100;
+    }
+
+    .btn-sm {
+        @apply min-h-8 gap-1.5 rounded-lg px-2.5 py-1.5 text-xs;
+    }
+
+    .btn-icon {
+        @apply h-9 w-9 shrink-0 p-0;
+    }
+
+    .btn-icon-sm {
+        @apply h-8 min-h-8 w-8 shrink-0 rounded-lg p-0;
+    }
+
+    /* ---------- Badge ---------- */
+    .badge {
+        @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset;
+    }
+
+    .badge-neutral {
+        @apply bg-slate-50 text-slate-600 ring-slate-200;
+    }
+
+    .badge-info {
+        @apply bg-emerald-50 text-emerald-800 ring-emerald-200;
+    }
+
+    .badge-success {
+        @apply bg-emerald-50 text-emerald-700 ring-emerald-200;
+    }
+
+    .badge-warning {
+        @apply bg-amber-50 text-amber-700 ring-amber-200;
+    }
+
+    .badge-danger {
+        @apply bg-red-50 text-red-600 ring-red-200;
+    }
+
+    .badge-dot {
+        @apply h-1.5 w-1.5 shrink-0 rounded-full bg-current;
+    }
+
+    /* ---------- Form ---------- */
+    .form-label {
+        @apply mb-2 block text-[13px] font-semibold text-slate-700;
+    }
+
+    .form-control {
+        @apply block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm shadow-slate-900/[0.02] outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10;
+    }
+
+    .form-control-error {
+        @apply border-red-400 focus:border-red-500 focus:ring-red-500/10;
+    }
+
+    input[type='number'] {
+        @apply appearance-none;
+        -moz-appearance: textfield;
+    }
+
+    input[type='number']::-webkit-inner-spin-button,
+    input[type='number']::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .form-hint {
+        @apply mt-2 text-xs leading-5 text-slate-500;
+    }
+
+    .form-error {
+        @apply mt-2 flex items-start gap-1.5 text-xs font-medium text-red-600;
+    }
+
+    /* ---------- Table ---------- */
+    .table-wrap {
+        @apply overflow-x-auto;
+    }
+
+    .data-table {
+        @apply w-full min-w-full text-left text-sm;
+    }
+
+    .data-table thead {
+        @apply bg-slate-50/80;
+    }
+
+    .data-table th {
+        @apply whitespace-nowrap border-b border-slate-200/70 px-5 py-3.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500 sm:px-6;
+    }
+
+    .data-table td {
+        @apply px-5 py-4 align-middle sm:px-6;
+    }
+
+    .data-table tbody tr {
+        @apply border-b border-slate-100 transition-colors last:border-0 hover:bg-emerald-50/30;
+    }
+
+    .data-table .cell-tight {
+        @apply px-3;
+    }
+
+    /* ---------- Sidebar ---------- */
+    .nav-link {
+        @apply relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-slate-500 transition-all duration-200 hover:bg-slate-100/80 hover:text-slate-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-slate-200;
+    }
+
+    .nav-link-active {
+        @apply bg-emerald-700 font-semibold text-white shadow-[0_8px_18px_-12px_rgba(4,120,87,0.65)] hover:bg-emerald-800 hover:text-white;
+    }
+
+    .nav-section-label {
+        @apply px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400;
+    }
+
+    /* ---------- Filters ---------- */
+    .filter-tab {
+        @apply relative -mb-px inline-flex shrink-0 items-center gap-2 border-b-2 border-transparent px-1 py-3.5 text-[13px] font-medium text-slate-500 transition-colors hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300;
+    }
+
+    .filter-tab-active {
+        @apply border-emerald-700 text-emerald-800;
+    }
+
+    .filter-count {
+        @apply rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-slate-500;
+    }
+
+    .filter-tab-active .filter-count {
+        @apply bg-emerald-700 text-white;
+    }
+
+    /* ---------- Stat strip ---------- */
+    .stat-cell {
+        @apply flex flex-col justify-between bg-white px-5 py-5 sm:px-6;
+    }
+
+    .stat-label {
+        @apply text-xs font-medium text-slate-500;
+    }
+
+    .stat-value {
+        @apply mt-2 text-[26px] font-semibold leading-none tracking-tight text-slate-900 tabular-nums;
+    }
+
+    .stat-hint {
+        @apply mt-2 text-[11px] leading-4 text-slate-400;
+    }
+
+    /* ---------- Dashboard ---------- */
+    .panel-dark {
+        @apply relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-slate-900 text-white shadow-[0_24px_60px_-32px_rgba(6,78,59,0.65)];
+    }
+
+    .panel-grid {
+        background-image:
+            linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+        background-size: 34px 34px;
+        mask-image: linear-gradient(to bottom, black, transparent 92%);
+    }
+
+    .quick-tile {
+        @apply relative flex flex-col gap-3 rounded-xl border border-slate-200/80 bg-white p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-[0_16px_30px_-24px_rgba(15,23,42,0.3)] focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-100;
+    }
+
+    /* ---------- Misc ---------- */
+    .icon-box {
+        @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-xl;
+    }
+
+    .icon-box-sm {
+        @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-lg;
+    }
+
+    .info-note {
+        @apply flex items-start gap-2.5 rounded-xl border border-emerald-100 bg-emerald-50/70 px-4 py-3.5 text-xs leading-5 text-emerald-900;
+    }
+
+    .warning-note {
+        @apply flex items-start gap-2.5 rounded-xl border border-amber-100 bg-amber-50/80 px-4 py-3.5 text-xs leading-5 text-amber-800;
+    }
+
+    .tabular {
+        font-variant-numeric: tabular-nums;
+    }
+
+    .avatar-initials {
+        @apply flex shrink-0 items-center justify-center rounded-xl bg-emerald-50 font-semibold uppercase tracking-wide text-emerald-800;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes page-rise {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #main-content > div {
+        animation: page-rise 0.45s cubic-bezier(0.22, 0.72, 0.3, 1) both;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
